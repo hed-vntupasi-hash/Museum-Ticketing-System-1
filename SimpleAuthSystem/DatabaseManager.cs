@@ -73,17 +73,6 @@ namespace SimpleAuthSystem
                 {
                     MessageBox.Show(ex.Message);
                 }
-
-
-                //conn.Open();
-                //MySqlCommand cmd = new MySqlCommand(query, conn);
-                //cmd.Parameters.AddWithValue("@user", username);
-                //cmd.Parameters.AddWithValue("@pass", hashedPassword);
-
-                //MessageBox.Show(hashedPassword + " " + Convert.ToString(cmd.ToString()));
-
-                //int count = Convert.ToInt32(cmd.ExecuteScalar());
-                //return count > 0;
                 return false;
             }
         }
