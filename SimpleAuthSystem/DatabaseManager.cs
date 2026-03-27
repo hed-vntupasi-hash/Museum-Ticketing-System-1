@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using BCrypt.Net;
 using System.Windows;
 using System.Windows.Shell;
+using Org.BouncyCastle.Crypto;
 
 namespace SimpleAuthSystem
 {
@@ -107,7 +108,60 @@ namespace SimpleAuthSystem
             }
         }
 
+        public static Tuple<int[], string[], DateOnly[], DateOnly[]> GetEvents()
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                List<int> ids = new List<int>();
+                List<string> ticketNames = new List<string>();
+                List<DateOnly> startDates = new List<DateOnly>();
+                List<DateOnly> endDates = new List<DateOnly>();
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT event_id AS id, event_name, start_date, end_date FROM events";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ids.Add(Convert.ToInt32(reader["id"]));
+                            ticketNames.Add(reader["event_name"].ToString());
 
+                            startDates.Add(DateOnly.FromDateTime(reader.GetDateTime("start_date")));
+                            endDates.Add(DateOnly.FromDateTime(reader.GetDateTime("end_date")));
+                        }
+                        return Tuple.Create(ids.ToArray(), ticketNames.ToArray(), startDates.ToArray(), endDates.ToArray());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                return Tuple.Create(new int[0], new string[0], new DateOnly[0], new DateOnly[0]);
+            }
+        }
 
+        public static bool PurchaseTicket(int ticketType_Id, int event_Id)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "INSERT INTO tickets (ticket_type_id, event_id) VALUES (@ticket_type_id, @event_id)";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@ticket_type_id", ticketType_Id);
+                    cmd.Parameters.AddWithValue("@event_id", event_Id);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

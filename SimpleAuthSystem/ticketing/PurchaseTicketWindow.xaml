@@ -33,17 +33,46 @@
 
             <!-- Ticket Type -->
             <TextBlock Text="Ticket Type"/>
-            <ComboBox Name="TicketTypeComboBox"
+            <ComboBox x:Name="TicketTypeComboBox"
                       Height="30"
                       Margin="0,5,0,15"/>
 
             <!-- Event Selection -->
             <TextBlock Text="Select Event"/>
             <ComboBox x:Name="EventComboBox"
+                      SelectionChanged="EventComboBoxChanged"
                       Height="30"
                       Margin="0,5,0,15"/>
 
-        
+
+            <StackPanel Orientation="Horizontal" Margin="10">
+
+                <!-- Start Date -->
+                <StackPanel Margin="5">
+                    <TextBlock Text="Event Start" Margin="0,0,0,3"/>
+                    <TextBox x:Name="StartDate"
+                             
+                             Width="150"
+                 IsReadOnly="True"
+                 AcceptsReturn="False"
+                 TextWrapping="NoWrap"
+                 Height="25"
+                 VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+                <!-- End Date -->
+                <StackPanel Margin="5">
+                    <TextBlock Text="Event Date" Margin="0,0,0,3"/>
+                    <TextBox  x:Name="EndDate"
+                              Width="150"
+                 IsReadOnly="True"
+                 AcceptsReturn="False"
+                 TextWrapping="NoWrap"
+                 Height="25"
+                 VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+            </StackPanel>
         </StackPanel>
 
         <!-- Buttons -->
@@ -57,7 +86,7 @@
                     Height="35"
                     Margin="10"
                     Background="#4CAF50"
-                    Foreground="White"/>
+                    Foreground="White" Click="PurchaseTicket_Click"/>
 
             <Button Content="Cancel"
                     Width="100"
