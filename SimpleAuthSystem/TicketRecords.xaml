@@ -1,0 +1,50 @@
+﻿<Window x:Class="SimpleAuthSystem.TicketRecords"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ticket Records" Height="450" Width="800">
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Text="Museum Ticket Records"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Margin="0,0,0,15"/>
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="1"
+                  Name="TicketGrid"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True">
+
+            <DataGrid.Columns>
+
+                <DataGridTextColumn Header="Ticket ID"
+                                    Binding="{Binding TicketId}" Width="100"/>
+
+                <DataGridTextColumn Header="Ticket Type ID"
+                                    Binding="{Binding TicketTypeId}" Width="120"/>
+
+                <DataGridTextColumn Header="Visitor ID"
+                                    Binding="{Binding VisitorId}" Width="120"/>
+
+                <DataGridTextColumn Header="Visit Date"
+                                    Binding="{Binding VisitDate}" Width="150"/>
+
+                <DataGridTextColumn Header="Status"
+                                    Binding="{Binding Status}" Width="120"/>
+
+                <DataGridTextColumn Header="Created At"
+                                    Binding="{Binding CreatedAt}" Width="150"/>
+
+            </DataGrid.Columns>
+
+        </DataGrid>
+
+    </Grid>
+</Window>
