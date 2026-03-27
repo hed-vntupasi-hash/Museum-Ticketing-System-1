@@ -4,6 +4,7 @@ using System.Diagnostics;
 using MySql.Data.MySqlClient;
 using BCrypt.Net;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace SimpleAuthSystem
 {
@@ -18,7 +19,6 @@ namespace SimpleAuthSystem
             return new MySqlConnection(connectionString);
         }
 
-        // --- QUERY 1: Register User ---
         public static bool RegisterUser(string firstName, string lastName, string email, string phone, string username, string password)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
@@ -38,7 +38,6 @@ namespace SimpleAuthSystem
             }
         }
 
-        // --- QUERY 2: Validate Login ---
         public static bool ValidateLogin(string username, string password)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
@@ -76,5 +75,39 @@ namespace SimpleAuthSystem
                 return false;
             }
         }
+
+        public static Tuple<int[], string[], decimal[]> GetTicketTypes()
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                List<int> ids = new List<int>();
+                List<string> ticketNames = new List<string>();
+                List<decimal> prices = new List<decimal>();
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT ticket_type_id AS id, type_name, price FROM ticket_types";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ids.Add(Convert.ToInt32(reader["id"]));
+                            ticketNames.Add(reader["type_name"].ToString());
+                            prices.Add(Convert.ToDecimal(reader["price"].ToString())); 
+                        }
+                        return Tuple.Create(ids.ToArray(), ticketNames.ToArray(), prices.ToArray());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                return Tuple.Create(new int[0], new string[0], new decimal[0]);
+            }
+        }
+
+
+
     }
 }
