@@ -1,0 +1,18 @@
+﻿<Window x:Class="SimpleAuthSystem.QR.QrWriterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QR Generator" Height="400" Width="320">
+
+    <StackPanel Margin="20">
+
+        <Button Content="Generate QR" Click="Generate_Click" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Numeric ID"/>
+        <TextBox Text="{Binding CurrentId}" IsReadOnly="True" Margin="0,0,0,5"/>
+
+        <TextBlock Text="Obfuscated Code"/>
+        <TextBox Text="{Binding GeneratedCode}" IsReadOnly="True" Margin="0,0,0,10"/>
+
+        <Image Source="{Binding QrCodeImage}" Width="200" Height="200" HorizontalAlignment="Center"/>
+    </StackPanel>
+</Window>

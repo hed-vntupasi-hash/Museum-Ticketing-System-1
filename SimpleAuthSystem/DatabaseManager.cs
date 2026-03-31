@@ -6,6 +6,8 @@ using BCrypt.Net;
 using System.Windows;
 using System.Windows.Shell;
 using Org.BouncyCastle.Crypto;
+using System.Data;
+using ZXing;
 
 namespace SimpleAuthSystem
 {
@@ -18,6 +20,40 @@ namespace SimpleAuthSystem
         private static MySqlConnection GetConnection()
         {
             return new MySqlConnection(connectionString);
+        }
+
+        public static void SetTicketQrCode(string qrCode)
+        {
+            int id = -1;
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT LAST_INSERT_ID() AS id";
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            reader.Read();
+                            id = Convert.ToInt32(reader["id"]);
+                            reader.Close();
+                        }
+                    }
+
+                    query = "UPDATE tickets SET qrcode=@qrcode WHERE ticket_id=@id";
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@qrCode", qrCode);
+                        cmd.Parameters.AddWithValue("@id", id);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
         public static bool RegisterUser(string firstName, string lastName, string email, string phone, string username, string password)
@@ -162,6 +198,61 @@ namespace SimpleAuthSystem
                 }
             }
             return true;
+        }
+        public static DataTable GetTickets()
+        {
+            try
+            {
+                using (MySqlConnection conn = GetConnection())
+                {
+                    conn.Open();
+                    string query =
+                        "SELECT T.ticket_id as id, E.event_name AS event, T2.type_name AS type, T2.price AS price " +
+                        "FROM tickets AS T " +
+                        "JOIN events AS E ON T.event_id = E.event_id " +
+                        "JOIN ticket_types AS T2 ON T.ticket_type_id = T2.ticket_type_id";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    return dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return null;
+        }
+
+
+        public static bool TapTicket(string qrCode)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    //string query = "SELECT ticket_id AS id FROM tickets WHERE qrcode=@qrcode;";
+                    string query = "SELECT ValidateTicketDate(@qrcode) AS isValid;";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@qrcode", qrCode);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        reader.Read();
+                        //MessageBox.Show(qrCode + "\n" + Convert.ToBoolean(reader["@isValid"]).ToString());
+                        return Convert.ToBoolean(reader["isValid"]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    //MessageBox.Show(qrCode + "\nTicket does not exist.");
+                }
+                return false;
+            }
         }
     }
 }

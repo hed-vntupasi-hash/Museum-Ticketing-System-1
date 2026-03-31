@@ -1,3 +1,8 @@
+
+-- Set 'log_bin_trust_function_creators' to 1
+
+
+
 CREATE DATABASE museum_ticketing_system;
 USE museum_ticketing_system;
 
@@ -24,6 +29,8 @@ CREATE TABLE tickets (
   visitor_id INT DEFAULT NULL,
   status VARCHAR(20) DEFAULT 'active',
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  qrcode VARCHAR(50), 
+  
   FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(ticket_type_id),
   FOREIGN KEY (event_id) REFERENCES events(event_id)
 );

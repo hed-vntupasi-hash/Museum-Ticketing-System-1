@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Org.BouncyCastle.Crypto;
+using SimpleAuthSystem.QR;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SimpleAuthSystem
@@ -23,6 +24,8 @@ namespace SimpleAuthSystem
     /// </summary>
     public partial class PurchaseTicketWindow : Window
     {
+        private readonly QR.MainViewModel qrGenerator = new QR.MainViewModel();
+
         private int[] ticketType_Ids;
         private string[] ticketType_Names;
         private decimal[] prices;
@@ -94,6 +97,7 @@ namespace SimpleAuthSystem
                 event_Ids[EventComboBox.SelectedIndex]
             ) == true)
             {
+                DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew());
                 MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
             }
             
