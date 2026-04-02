@@ -51,7 +51,7 @@ namespace SimpleAuthSystem.QR
         /// <summary>
         /// Generates a new code, updates UI bindings, returns the obfuscated string, and saves the image.
         /// </summary>
-        public string GenerateNew()
+        public string GenerateNew(string TitleText, string ContentText)
         {
             long id = _generator.GetNextId();
 

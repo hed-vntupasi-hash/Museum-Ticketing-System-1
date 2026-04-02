@@ -8,6 +8,7 @@ using System.Windows.Shell;
 using Org.BouncyCastle.Crypto;
 using System.Data;
 using ZXing;
+using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
 
 namespace SimpleAuthSystem
 {
@@ -253,6 +254,31 @@ namespace SimpleAuthSystem
                 }
                 return false;
             }
+        }
+
+
+        public static bool CreateEvent(string name, string description, DateTime startDate, DateTime endDate)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "INSERT INTO events (event_name, description, start_date, end_date) VALUES (@name, @description, @startDate, @endDate)";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@name", name);
+                    cmd.Parameters.AddWithValue("@description", description);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

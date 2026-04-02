@@ -16,7 +16,7 @@ namespace SimpleAuthSystem.QR
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
             //MessageBox.Show(_vm.GenerateNew());
-            _vm.GenerateNew();
+            _vm.GenerateNew("Title", "Description");
         }
     }
 }
