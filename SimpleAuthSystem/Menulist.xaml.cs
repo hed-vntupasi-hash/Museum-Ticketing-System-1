@@ -62,7 +62,12 @@ namespace SimpleAuthSystem
             EventsScheduler window = new EventsScheduler();
             window.Show();
         }
-        
+
+        private void Dashboard_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard window = new Dashboard();
+            window.Show();
+        }
 
 
     }

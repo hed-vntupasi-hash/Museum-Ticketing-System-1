@@ -280,5 +280,36 @@ namespace SimpleAuthSystem
             }
             return true;
         }
+
+        public static Tuple<string[], int[], decimal[]> GetTicketsByEvent()
+        {
+            List<string> events = new List<string>();
+            List<int> ticketsSold = new List<int>();
+            List<decimal> totalProfit = new List<decimal>();
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "select t.event_id, e.event_name, count(*) as `tickets_sold`, sum(tt.price) as profit from events as e right join tickets as t on e.event_id = t.event_id left join ticket_types as tt on t.ticket_type_id = tt.ticket_type_id group by t.event_id;";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        events.Add(reader["event_name"].ToString());
+                        ticketsSold.Add(reader.GetInt32("tickets_sold"));
+                        totalProfit.Add(reader.GetDecimal("profit"));
+                    }
+                    return Tuple.Create(events.ToArray(), ticketsSold.ToArray(), totalProfit.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                return Tuple.Create(new string[0], new int[0], new decimal[0]);
+            }
+        }
     }
 }
