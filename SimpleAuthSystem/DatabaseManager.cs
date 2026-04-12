@@ -228,7 +228,7 @@ namespace SimpleAuthSystem
         }
 
 
-        public static bool TapTicket(string qrCode)
+        public static Tuple<bool, string> TapTicket(string qrCode)
         {
             using (MySqlConnection conn = GetConnection())
             {
@@ -236,7 +236,7 @@ namespace SimpleAuthSystem
                 {
                     conn.Open();
                     //string query = "SELECT ticket_id AS id FROM tickets WHERE qrcode=@qrcode;";
-                    string query = "SELECT ValidateTicketDate(@qrcode) AS isValid;";
+                    string query = "CALL GetTicketValidity(@qrcode)";
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@qrcode", qrCode);
 
@@ -244,7 +244,11 @@ namespace SimpleAuthSystem
                     {
                         reader.Read();
                         //MessageBox.Show(qrCode + "\n" + Convert.ToBoolean(reader["@isValid"]).ToString());
-                        return Convert.ToBoolean(reader["isValid"]);
+                        return Tuple.Create
+                        (
+                            Convert.ToBoolean(reader["isValid"]),
+                            reader["message"].ToString()
+                        );
                     }
                 }
                 catch (Exception ex)
@@ -252,7 +256,7 @@ namespace SimpleAuthSystem
                     MessageBox.Show(ex.Message);
                     //MessageBox.Show(qrCode + "\nTicket does not exist.");
                 }
-                return false;
+                return Tuple.Create(false, "Error processing ticket");
             }
         }
 

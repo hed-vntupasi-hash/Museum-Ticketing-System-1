@@ -49,19 +49,22 @@ namespace SimpleAuthSystem.QR
 
                 try
                 {
-                    bool ticketDateIsValid = DatabaseManager.TapTicket
-                    (
-                        DecodeQRCode(filePath)
-                    );
+                    Tuple<bool, string> validity = DatabaseManager.TapTicket(DecodeQRCode(filePath));
+                    MessageBox.Show(validity.Item2);
 
-                    if (ticketDateIsValid == true)
-                    {
-                        MessageBox.Show("Ticket Date is valid. Proceed");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Access Denied.");
-                    }
+                    //bool ticketDateIsValid = DatabaseManager.TapTicket
+                    //(
+                    //    DecodeQRCode(filePath)
+                    //);
+
+                    //if (validity.Item1 == true)
+                    //{
+                    //    MessageBox.Show("Ticket Date is valid. Proceed");
+                    //}
+                    //else
+                    //{
+                    //    MessageBox.Show("Access Denied.");
+                    //}
                 }
                 catch (Exception ex)
                 {
