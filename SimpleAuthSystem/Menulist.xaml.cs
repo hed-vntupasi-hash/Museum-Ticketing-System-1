@@ -69,6 +69,11 @@ namespace SimpleAuthSystem
             window.Show();
         }
 
-
+        private void ClientReceiver_Click(object sender, RoutedEventArgs e)
+        {
+            ClientReceiver window = new ClientReceiver();
+            window.Show();
+        }
+        
     }
 }

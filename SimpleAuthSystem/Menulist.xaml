@@ -45,11 +45,16 @@
                     
                             Click="EventsScheduler_Click"/>
 
-            <Button Content="Daashboard"
+            <Button Content="Dashboard"
                     Width="120"
                     Height="40"
                     Margin="10"
                      Click="Dashboard_Click"/>
+            <Button Content="Client Receiver"
+                    Width="120"
+                    Height="40"
+                    Margin="10"
+                     Click="ClientReceiver_Click"/>
         </StackPanel>
     </Grid>
 </Window>

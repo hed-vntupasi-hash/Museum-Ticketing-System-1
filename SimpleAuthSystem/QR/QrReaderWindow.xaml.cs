@@ -1,18 +1,55 @@
-﻿using System;
-using System.Windows;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Win32;
+using System;
 using System.Drawing; // Remember to install System.Drawing.Common
+using System.Windows;
 using ZXing;
-using ZXing.Windows.Compatibility;
+using ZXing.Aztec.Internal;
 using ZXing.Common;
+using ZXing.Windows.Compatibility;
 
 namespace SimpleAuthSystem.QR
 {
     public partial class QrReaderWindow : Window
     {
+        private HubConnection _connection;
         public QrReaderWindow()
         {
             InitializeComponent();
+            InitializeConnection();
+        }
+
+        private void InitializeConnection()
+        {
+            // 1. Setup Connection (Use Server IP if on different machines)
+            _connection = new HubConnectionBuilder()
+                .WithUrl("http://192.168.1.50:5000/requestHub")
+                .WithAutomaticReconnect()
+                .Build();
+
+            // 2. Define what happens when the server sends a response
+            _connection.On<string, bool>("ReceiveResponse", (text, flag) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ResponseLabel.Text = text;
+                    StatusLabel.Text = $"Boolean: {flag}";
+                });
+            });
+            StartConnection();
+        }
+        private async void StartConnection()
+        {
+            try { await _connection.StartAsync(); }
+            catch (Exception ex) { MessageBox.Show($"Connection Error: {ex.Message}"); }
+        }
+
+        private async void SendTicketId(string toSend)
+        {
+            if (_connection.State == HubConnectionState.Connected)
+            {
+                await _connection.InvokeAsync("SendRequest", toSend);
+            }
         }
 
         public static string DecodeQRCode(string filePath)
@@ -49,6 +86,7 @@ namespace SimpleAuthSystem.QR
 
                 try
                 {
+                    SendTicketId(DecodeQRCode(filePath));
                     Tuple<bool, string> validity = DatabaseManager.TapTicket(DecodeQRCode(filePath));
                     MessageBox.Show(validity.Item2);
 
