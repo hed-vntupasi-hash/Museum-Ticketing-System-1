@@ -1,11 +1,8 @@
-﻿
-using Org.BouncyCastle.Crypto;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using SimpleAuthSystem.QR;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -17,26 +14,34 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Microsoft.AspNetCore.SignalR.Client;
 
-namespace SimpleAuthSystem
+namespace SimpleAuthSystem.ticketing
 {
     /// <summary>
-    /// Interaction logic for PurchaseTicketWindow.xaml
+    /// Interaction logic for TicketPurchaser.xaml
     /// </summary>
-    public partial class PurchaseTicketWindow : Window
+    public partial class TicketPurchaser : Window
     {
-        //private readonly QR.MainViewModel qrGenerator = new QR.MainViewModel();
         private HubConnection _connection;
+
         private readonly TicketPurchaseBinding _vm = new TicketPurchaseBinding();
 
-        public PurchaseTicketWindow()
+        public TicketPurchaser()
         {
             InitializeComponent();
             InitializeConnection();
             DataContext = _vm;
         }
+
+        private int[] ticketIds;
+        private string[] ticketTypes;
+        private decimal[] ticketPrices;
+
+        private int[] eventIds;
+        private string[] events;
+        private DateOnly[] startDates;
+        private DateOnly[] endDates;
+
 
         class Type
         {
@@ -53,36 +58,11 @@ namespace SimpleAuthSystem
             public DateOnly end_date { get; set; }
         }
 
-        class TicketPurchase
+        class TicketPurchaseRequest
         {
             public Type[] types { get; set; }
             public Event[] events { get; set; }
         }
-        private int[] ticketIds;
-        private string[] ticketTypes;
-        private decimal[] ticketPrices;
-
-        private int[] eventIds;
-        private string[] events;
-        private DateOnly[] startDates;
-        private DateOnly[] endDates;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         private void InitializeConnection()
         {
@@ -97,7 +77,7 @@ namespace SimpleAuthSystem
             {
                 Dispatcher.Invoke(() =>
                 {
-                    TicketPurchase ticketPurchase = JsonSerializer.Deserialize<TicketPurchase>
+                    TicketPurchaseRequest ticketPurchase = JsonSerializer.Deserialize<TicketPurchaseRequest>
                     (
                         text,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -138,9 +118,6 @@ namespace SimpleAuthSystem
                 });
             });
 
-
-
-
             _connection.On<string>("ConfirmTicketPurchase", (Data) =>
             {
                 Dispatcher.Invoke(() =>
@@ -151,20 +128,8 @@ namespace SimpleAuthSystem
                 });
             });
 
-
-
-
-
-
-
-
-
-
-
-
             StartConnection();
         }
-
         private async void StartConnection()
         {
             try
@@ -217,6 +182,7 @@ namespace SimpleAuthSystem
 
         private void PurchaseTicket_Click(object sender, RoutedEventArgs e)
         {
+            _vm.GenerateNew("test", EventComboBox.Text, TicketTypeComboBox.Text);
             SendTicketPurchaseRequest();
             //if (DatabaseManager.PurchaseTicket
             //(
@@ -227,7 +193,7 @@ namespace SimpleAuthSystem
             //    DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew(EventComboBox.Text, TicketTypeComboBox.Text));
             //    MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
             //}
-
+            MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
