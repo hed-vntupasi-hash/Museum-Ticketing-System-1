@@ -87,8 +87,8 @@ namespace SimpleAuthSystem.QR
                 try
                 {
                     SendTicketId(DecodeQRCode(filePath));
-                    Tuple<bool, string> validity = DatabaseManager.TapTicket(DecodeQRCode(filePath));
-                    MessageBox.Show(validity.Item2);
+                    //Tuple<bool, string> validity = DatabaseManager.TapTicket(DecodeQRCode(filePath));
+                    //MessageBox.Show(validity.Item2);
 
                     //bool ticketDateIsValid = DatabaseManager.TapTicket
                     //(
