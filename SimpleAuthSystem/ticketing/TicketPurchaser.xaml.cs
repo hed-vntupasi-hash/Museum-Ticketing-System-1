@@ -24,6 +24,8 @@ namespace SimpleAuthSystem.ticketing
     {
         private HubConnection _connection;
 
+        private string testString = "";
+
         private readonly TicketPurchaseBinding _vm = new TicketPurchaseBinding();
 
         public TicketPurchaser()
@@ -72,7 +74,6 @@ namespace SimpleAuthSystem.ticketing
                 .WithAutomaticReconnect()
                 .Build();
 
-            // 2. Define what happens when the server sends a response
             _connection.On<string>("TicketPurchaseInfoResponse", (text) =>
             {
                 Dispatcher.Invoke(() =>
@@ -128,6 +129,16 @@ namespace SimpleAuthSystem.ticketing
                 });
             });
 
+            _connection.On<string, string>("ReceiveAlert", (msg) =>
+            {
+                Dispatcher.Invoke(() => {
+                    MessageBox.Show(msg);
+                    //LblServerPulse.Text = $"Received: {msg}";
+                });
+
+                return $"WPF Client acknowledged at {DateTime.Now.ToShortTimeString()}";
+            });
+
             StartConnection();
         }
         private async void StartConnection()
@@ -160,7 +171,14 @@ namespace SimpleAuthSystem.ticketing
                     EventId = selectedEventId
                 };
                 string jsonData = JsonSerializer.Serialize(requestData);
-                await _connection.InvokeAsync("PurchaseTicket", jsonData);
+
+                string response = await _connection.InvokeAsync<string>
+                (
+                    "PurchaseTicket",
+                    ticketIds[TicketTypeComboBox.SelectedIndex],
+                    eventIds[EventComboBox.SelectedIndex]
+                );
+                testString = response;
             }
         }
 
@@ -183,17 +201,9 @@ namespace SimpleAuthSystem.ticketing
         private void PurchaseTicket_Click(object sender, RoutedEventArgs e)
         {
             _vm.GenerateNew("test", EventComboBox.Text, TicketTypeComboBox.Text);
+
             SendTicketPurchaseRequest();
-            //if (DatabaseManager.PurchaseTicket
-            //(
-            //    ticketType_Ids[TicketTypeComboBox.SelectedIndex],
-            //    event_Ids[EventComboBox.SelectedIndex]
-            //) == true)
-            //{
-            //    DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew(EventComboBox.Text, TicketTypeComboBox.Text));
-            //    MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
-            //}
-            MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
+            MessageBox.Show(testString);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
