@@ -163,22 +163,14 @@ namespace SimpleAuthSystem.ticketing
         {
             if (_connection.State == HubConnectionState.Connected)
             {
-                int selectedTicketTypeId = ticketIds[TicketTypeComboBox.SelectedIndex];
-                int selectedEventId = eventIds[EventComboBox.SelectedIndex];
-                var requestData = new
-                {
-                    TicketTypeId = selectedTicketTypeId,
-                    EventId = selectedEventId
-                };
-                string jsonData = JsonSerializer.Serialize(requestData);
-
-                string response = await _connection.InvokeAsync<string>
+                string qrCode = await _connection.InvokeAsync<string>
                 (
                     "PurchaseTicket",
                     ticketIds[TicketTypeComboBox.SelectedIndex],
                     eventIds[EventComboBox.SelectedIndex]
                 );
-                testString = response;
+                _vm.GenerateNew(qrCode, EventComboBox.Text, TicketTypeComboBox.Text);
+                MessageBox.Show(qrCode);
             }
         }
 
@@ -200,10 +192,8 @@ namespace SimpleAuthSystem.ticketing
 
         private void PurchaseTicket_Click(object sender, RoutedEventArgs e)
         {
-            _vm.GenerateNew("test", EventComboBox.Text, TicketTypeComboBox.Text);
 
             SendTicketPurchaseRequest();
-            MessageBox.Show(testString);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
