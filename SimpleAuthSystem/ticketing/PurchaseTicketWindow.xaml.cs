@@ -93,15 +93,15 @@ namespace SimpleAuthSystem
 
         private void PurchaseTicket_Click(object sender, RoutedEventArgs e)
         {
-            if (DatabaseManager.PurchaseTicket
-            (
-                ticketType_Ids[TicketTypeComboBox.SelectedIndex],
-                event_Ids[EventComboBox.SelectedIndex]
-            ) == true)
-            {
-                DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew(EventComboBox.Text, TicketTypeComboBox.Text));
-                MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
-            }
+            //if (DatabaseManager.PurchaseTicket
+            //(
+            //    ticketType_Ids[TicketTypeComboBox.SelectedIndex],
+            //    event_Ids[EventComboBox.SelectedIndex]
+            //) == true)
+            //{
+            //    DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew(EventComboBox.Text, TicketTypeComboBox.Text));
+            //    MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
+            //}
             
         }
 

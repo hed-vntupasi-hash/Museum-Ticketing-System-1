@@ -61,14 +61,15 @@ namespace SimpleAuthSystem
 
         public string PurchaseTicket(int typeId, int eventId)
         {
-            string qr = "";
-            if (DatabaseManager.PurchaseTicket(typeId, eventId) == true)
-            {
-                // Todo: fix Title & Content
-                qr = qrGenerator.GenerateNew("Title", "Content");
+            string qr = qrGenerator.GenerateNew("Title", "Content");
+            DatabaseManager.PurchaseTicket(typeId, eventId, qr);
+            //if (DatabaseManager.PurchaseTicket(typeId, eventId, qr) == true)
+            //{
+            //    // Todo: fix Title & Content
+            //    //qr = qrGenerator.GenerateNew("Title", "Content");
 
-                DatabaseManager.SetTicketQrCode(qr);
-            }
+            //    //DatabaseManager.SetTicketQrCode(qr);
+            //}
             return qr;
         }
 

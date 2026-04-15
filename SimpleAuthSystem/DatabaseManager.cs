@@ -179,26 +179,29 @@ namespace SimpleAuthSystem
             }
         }
 
-        public static bool PurchaseTicket(int ticketType_Id, int event_Id)
+        public static bool PurchaseTicket(int ticketType_Id, int event_Id, string qr)
         {
             using (MySqlConnection conn = GetConnection())
             {
                 try
                 {
                     conn.Open();
-                    string query = "INSERT INTO tickets (ticket_type_id, event_id) VALUES (@ticket_type_id, @event_id)";
+                    //string query = "INSERT INTO tickets (ticket_type_id, event_id) VALUES (@ticket_type_id, @event_id)";
+                    string query = "CALL PurchaseTicket(@ticket_type_id, @event_id, @qr)";
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@ticket_type_id", ticketType_Id);
                     cmd.Parameters.AddWithValue("@event_id", event_Id);
+                    cmd.Parameters.AddWithValue("@qr", qr);
+
                     return cmd.ExecuteNonQuery() > 0;
+                    //return true;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
-                    return false;
                 }
             }
-            return true;
+            return false;
         }
         public static DataTable GetTickets()
         {
