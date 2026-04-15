@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Org.BouncyCastle.Crypto;
+using SimpleAuthSystem.QR;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,8 +16,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Org.BouncyCastle.Crypto;
-using SimpleAuthSystem.QR;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SimpleAuthSystem
@@ -38,6 +39,7 @@ namespace SimpleAuthSystem
         public PurchaseTicketWindow()
         {
             InitializeComponent();
+            //InitializePersistence();
 
             LoadTicketTypes();
             LoadEvents();
