@@ -45,9 +45,11 @@ BEGIN
 		SET message = CONCAT('Ticket Not Valid Before ', DATE(start));
 	ELSEIF now > end THEN
 		SET message = CONCAT('Ticket Expired After ', DATE(end));
-	ELSE
+	ELSEIF now > start AND now < end THEN
 		SET message = CONCAT('Proceed.');
 		SET isValid = TRUE;
+	ELSE 
+		SET message = CONCAT('Invalid QR code.');
 	END IF;
     
     SELECT isValid, message;

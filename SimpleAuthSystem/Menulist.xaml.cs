@@ -42,7 +42,8 @@ namespace SimpleAuthSystem
                 builder.Services.AddSignalR();
 
                 // Listen on Port 5000 on ALL local network adapters
-                builder.WebHost.UseUrls("http://*:5000");
+                builder.WebHost.UseUrls("http://0.0.0.0:5000");
+
 
                 var app = builder.Build();
                 app.MapHub<MyHub>("/requestHub");
