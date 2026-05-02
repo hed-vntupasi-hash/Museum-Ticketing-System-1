@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using SimpleAuthSystem.QR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -87,6 +89,23 @@ namespace SimpleAuthSystem.ticketing
                     ticketTypes = ticketPurchase.types.Select(s => s.name).ToArray();
                     ticketPrices = ticketPurchase.types.Select(s => s.price).ToArray();
 
+                    // for unit testing
+
+                        List<int> tmpId = ticketIds.ToList();
+                        List<string> tmpTypes = ticketTypes.ToList();
+                        List<decimal> tmpPrices = ticketPrices.ToList();
+
+                        tmpId.Insert(0, -1);
+                        tmpTypes.Insert(0, "-");
+                        tmpPrices.Insert(0, 12);
+
+                        ticketIds = tmpId.ToArray();
+                        ticketTypes = tmpTypes.ToArray();
+                        ticketPrices = tmpPrices.ToArray();
+
+                    // end
+
+
                     TicketTypeComboBox.ItemsSource = ticketTypes;
                     //MessageBox.Show("Types Count: " + ticketTypes.Length);
 
@@ -94,9 +113,29 @@ namespace SimpleAuthSystem.ticketing
                         TicketTypeComboBox.SelectedIndex = 0;
 
                     eventIds = ticketPurchase.events.Select(s => s.id).ToArray();
-                    events = ticketPurchase.events.Select(s => s.name).ToArray(); ;
-                    startDates = ticketPurchase.events.Select(s => s.start_date).ToArray(); ;
-                    endDates = ticketPurchase.events.Select(s => s.end_date).ToArray(); ;
+                    events = ticketPurchase.events.Select(s => s.name).ToArray();
+                    startDates = ticketPurchase.events.Select(s => s.start_date).ToArray();
+                    endDates = ticketPurchase.events.Select(s => s.end_date).ToArray();
+
+
+                    // for unit testing
+                    tmpId = eventIds.ToList();
+                    tmpId.Insert(0, -1);
+                    eventIds = tmpId.ToArray();
+
+                    List<string> tmpEvents = events.ToList();
+                    tmpEvents.Insert(0, "-");
+                    events = tmpEvents.ToArray();
+
+                    List<DateOnly> tmpDates = startDates.ToList();
+                    tmpDates.Insert(0, startDates[0]);
+                    startDates = tmpDates.ToArray();
+
+                    tmpDates = endDates.ToList();
+                    tmpDates.Insert(0, endDates[0]);
+                    endDates = tmpDates.ToArray();
+                    // end
+
 
                     EventComboBox.ItemsSource = events;
 
@@ -161,17 +200,49 @@ namespace SimpleAuthSystem.ticketing
 
         private async void SendTicketPurchaseRequest()
         {
-            if (_connection.State == HubConnectionState.Connected)
+            try
             {
-                string qrCode = await _connection.InvokeAsync<string>
-                (
-                    "PurchaseTicket",
-                    ticketIds[TicketTypeComboBox.SelectedIndex],
-                    eventIds[EventComboBox.SelectedIndex]
-                );
-                _vm.GenerateNew(qrCode, EventComboBox.Text, TicketTypeComboBox.Text);
-                MessageBox.Show(qrCode);
+
+                if (_connection.State == HubConnectionState.Connected)
+                {
+                    string qrCode = await _connection.InvokeAsync<string>
+                    (
+                        
+                        "PurchaseTicket",
+                        ticketIds[TicketTypeComboBox.SelectedIndex],
+                        eventIds[EventComboBox.SelectedIndex]
+                    );
+                    _vm.GenerateNew(qrCode, EventComboBox.Text, TicketTypeComboBox.Text);
+
+                    if (qrCode[0] == '-')
+                    {
+                        MessageBox.Show("Purchase completed!\n    Event: " + EventComboBox.Text + "\n    Ticket type: " + TicketTypeComboBox.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show(qrCode, "Error");
+                    }
+                }
             }
+
+            
+            catch (InvalidOperationException ex) 
+            {
+                await Task.Delay(3000);
+                MessageBox.Show("Connection loat. Please reconnect.\n\n" + ex .Message, "Error");
+                
+            }
+            catch (Exception ex)
+            {
+                await Task.Delay(3000);
+                MessageBox.Show("Unexpected error:\n\n" + ex.Message, "Error");
+            }
+            _connection.Closed += async (error) =>
+            {
+                MessageBox.Show("Disconnected from server.");
+            };
+              
+            
         }
 
         private string ConvertDate(DateOnly date)

@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace SimpleAuthSystem
+namespace SimpleAuthSystem  
 {
     /// <summary>
     /// Interaction logic for Menulist.xaml
