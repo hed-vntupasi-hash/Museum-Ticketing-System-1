@@ -52,8 +52,19 @@ namespace SimpleAuthSystem
                 MessageBox.Show("Please enter an event name.");
                 return;
             }
+            else if (string.IsNullOrWhiteSpace(dpStartDate.Text))
+            {
+                MessageBox.Show("Please enter a start date.");
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(dpEndDate.Text))
+            {
+                MessageBox.Show("Please enter a Endate date.");
+                return;
+            }
 
             try
+
             {
                 DatabaseManager.CreateEvent(txtEventName.Text, txtDescription.Text, (DateTime)dpStartDate.SelectedDate, (DateTime)dpEndDate.SelectedDate);
 

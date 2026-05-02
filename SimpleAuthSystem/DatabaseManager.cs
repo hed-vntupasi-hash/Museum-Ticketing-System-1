@@ -9,6 +9,7 @@ using Org.BouncyCastle.Crypto;
 using System.Data;
 using ZXing;
 using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
+using System.Text.RegularExpressions;
 
 namespace SimpleAuthSystem
 {
@@ -179,7 +180,7 @@ namespace SimpleAuthSystem
             }
         }
 
-        public static bool PurchaseTicket(int ticketType_Id, int event_Id, string qr)
+        public static string PurchaseTicket(int ticketType_Id, int event_Id, string qr)
         {
             using (MySqlConnection conn = GetConnection())
             {
@@ -193,15 +194,50 @@ namespace SimpleAuthSystem
                     cmd.Parameters.AddWithValue("@event_id", event_Id);
                     cmd.Parameters.AddWithValue("@qr", qr);
 
-                    return cmd.ExecuteNonQuery() > 0;
+                    //return cmd.ExecuteNonQuery() > 0;
+                    if (cmd.ExecuteNonQuery() > 0)
+                    {
+                        return "Success";
+                    }
                     //return true;
                 }
-                catch (Exception ex)
+                catch (MySqlException ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    string columnName = "";
+                    var match = Regex.Match(ex.Message, @"for column '([^']+)'");
+                    if (ex.Number == 1366 && match.Success)
+                    {
+                        columnName = match.Groups[1].Value;
+                        MessageBox.Show(columnName + "\n\n" + ex.Message, "Data Type Mismatch");
+                        return "data type mismatch";
+                    } else if (ex.Number == 1366)
+                    {
+                        return "TruncatedWrongValue";
+                    }
+                    else if (ex.Number == 1452)
+                    {
+                        match = Regex.Match(ex.Message, @"FOREIGN KEY \(`([^`]+)`\)");
+                        columnName = match.Groups[1].Value;
+
+                        if (columnName == "ticket_type_id")
+                            return "NonExistentTicketTypeId";
+
+                        MessageBox.Show("NonExistentTicketTypeId");
+
+                        return "NonExistentForeignKey";
+
+                    }
+                    else
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                    return ex.Number.ToString();
+
+
+
                 }
             }
-            return false;
+            return "error";
         }
         public static DataTable GetTickets()
         {

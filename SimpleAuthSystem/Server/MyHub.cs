@@ -61,8 +61,31 @@ namespace SimpleAuthSystem
 
         public string PurchaseTicket(int typeId, int eventId)
         {
-            string qr = qrGenerator.GenerateNew("Title", "Content");
-            DatabaseManager.PurchaseTicket(typeId, eventId, qr);
+            string qr = "";
+            string message = "";
+
+            //qr = qrGenerator.GenerateNew("Title", "Content");
+            message = DatabaseManager.PurchaseTicket(typeId, eventId, qr);
+
+
+            switch (message)
+            {
+                case "Success":
+                    return qrGenerator.GenerateNew("Title", "Content");
+                case "NonExistentTicketTypeId":
+                    return "Invalid Ticket Type.";
+                default:
+                    return "Purchased failed";
+            }
+            if (message == "Success")
+            {
+                //MessageBox.Show(message, "Purchase Message");
+                //qr = qrGenerator.GenerateNew("Title", "Content");
+            } else
+             return message;
+
+
+
             //if (DatabaseManager.PurchaseTicket(typeId, eventId, qr) == true)
             //{
             //    // Todo: fix Title & Content
@@ -70,7 +93,7 @@ namespace SimpleAuthSystem
 
             //    //DatabaseManager.SetTicketQrCode(qr);
             //}
-            return qr;
+            //return qr;
         }
 
         class Type
