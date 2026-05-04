@@ -19,7 +19,7 @@ namespace SimpleAuthSystem
 
                 if (isAuthenticated)
                 {
-                    new Dashboard().Show();
+                    new Menulist().Show();
                     this.Close();
                 }
                 else

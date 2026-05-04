@@ -2,9 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SimpleAuthSystem"
-             
-             StartupUri="Menulist.xaml">
-    <!--StartupUri="Authentication/LoginWindow.xaml">-->
+             StartupUri="Authentication/LoginWindow.xaml">
+             <!--StartupUri="LoginWindow.xaml">-->
+            
     <Application.Resources>
 
     </Application.Resources>

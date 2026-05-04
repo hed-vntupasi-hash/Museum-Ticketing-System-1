@@ -182,6 +182,7 @@ namespace SimpleAuthSystem
 
         public static string PurchaseTicket(int ticketType_Id, int event_Id, string qr)
         {
+            //MessageBox.Show(qr, "Purchase Ticket");
             using (MySqlConnection conn = GetConnection())
             {
                 try
@@ -221,6 +222,8 @@ namespace SimpleAuthSystem
 
                         if (columnName == "ticket_type_id")
                             return "NonExistentTicketTypeId";
+                        else if (columnName == "event_id")
+                            return "NonExistentTicketEventId";
 
                         MessageBox.Show("NonExistentTicketTypeId");
 

@@ -64,16 +64,19 @@ namespace SimpleAuthSystem
             string qr = "";
             string message = "";
 
-            //qr = qrGenerator.GenerateNew("Title", "Content");
+            qr = qrGenerator.GenerateNew("Title", "Content");
+            //MessageBox.Show(qr, "Sent QR Code");
             message = DatabaseManager.PurchaseTicket(typeId, eventId, qr);
 
 
             switch (message)
             {
                 case "Success":
-                    return qrGenerator.GenerateNew("Title", "Content");
+                    return "-" + qr;
                 case "NonExistentTicketTypeId":
                     return "Invalid Ticket Type.";
+                case "NonExistentTicketEventId":
+                    return "Invalid Ticket Event.";
                 default:
                     return "Purchased failed";
             }
