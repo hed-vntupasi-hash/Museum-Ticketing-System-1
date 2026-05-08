@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using MySql.Data.MySqlClient;
-
+using System.Text.RegularExpressions;
 namespace SimpleAuthSystem
 {
     public partial class LoginWindow : Window
@@ -32,6 +32,7 @@ namespace SimpleAuthSystem
                 MessageBox.Show("Login Error: " + ex.Message);
             }
         }
+
 
         private void btnGoToSignup_Click(object sender, RoutedEventArgs e)
         {
