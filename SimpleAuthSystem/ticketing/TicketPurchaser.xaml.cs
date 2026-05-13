@@ -207,15 +207,15 @@ namespace SimpleAuthSystem.ticketing
                 {
                     string qrCode = await _connection.InvokeAsync<string>
                     (
-                        
                         "PurchaseTicket",
                         ticketIds[TicketTypeComboBox.SelectedIndex],
                         eventIds[EventComboBox.SelectedIndex]
                     );
-                    _vm.GenerateNew(qrCode, EventComboBox.Text, TicketTypeComboBox.Text);
 
+                    MessageBox.Show(qrCode.Substring(1), "Received QR Code");
                     if (qrCode[0] == '-')
                     {
+                        _vm.GenerateNew(qrCode.Substring(1), EventComboBox.Text, TicketTypeComboBox.Text);
                         MessageBox.Show("Purchase completed!\n    Event: " + EventComboBox.Text + "\n    Ticket type: " + TicketTypeComboBox.Text);
                     }
                     else

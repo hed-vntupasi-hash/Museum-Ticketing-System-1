@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 public class TicketPurchaseBinding : INotifyPropertyChanged
@@ -51,11 +52,12 @@ public class TicketPurchaseBinding : INotifyPropertyChanged
     /// </summary>
     public string GenerateNew(string code, string TitleText, string ContentText)
     {
-        long id = _generator.GetNextId();
+        //long id = _generator.GetNextId();
 
         //CurrentId = id;
         //GeneratedCode = _generator.GenerateCode(id);
 
+        System.Windows.MessageBox.Show(code, "Generation");
         var bmp = GenerateQrCodeWithText(code, TitleText, ContentText);
 
         // Save automatically
@@ -87,7 +89,7 @@ public class TicketPurchaseBinding : INotifyPropertyChanged
                     g.Clear(Color.White);
                     g.DrawImage(bmp, 0, extraHeight / 2);
 
-                    using (var titleFont = new Font("Arial", 12, FontStyle.Bold))
+                    using (var titleFont = new Font("Arial", 12, System.Drawing.FontStyle.Bold))
                     using (var brush = new SolidBrush(Color.Black))
                     {
                         var titleSize = g.MeasureString(title, titleFont);

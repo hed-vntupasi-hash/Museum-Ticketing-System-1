@@ -46,6 +46,7 @@ namespace SimpleAuthSystem.QR
 
         private async void SendTicketId(string toSend)
         {
+            MessageBox.Show(toSend, "Send ID");
             if (_connection.State == HubConnectionState.Connected)
             {
                 await _connection.InvokeAsync("SendRequest", toSend);
