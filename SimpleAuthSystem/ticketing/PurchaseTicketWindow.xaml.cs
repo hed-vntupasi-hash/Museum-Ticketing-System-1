@@ -102,7 +102,7 @@ namespace SimpleAuthSystem
             //    DatabaseManager.SetTicketQrCode(qrGenerator.GenerateNew(EventComboBox.Text, TicketTypeComboBox.Text));
             //    MessageBox.Show("Ticket purchased successfully!", "Purchase Successful");
             //}
-            
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

@@ -1,40 +1,80 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
-namespace SimpleAuthSystem;
-
-public partial class ClientReceiver : Window
+namespace SimpleAuthSystem.Pages
 {
-    public ClientReceiver()
+    public partial class ClientReceiverPage : Page
     {
-        InitializeComponent();
+        private bool serverStarted = false;
 
-        // Listen for Hub events to update UI
-        ServerEvents.OnMessageReceived += (msg) =>
+        public ClientReceiverPage()
         {
-            Dispatcher.Invoke(() => RequestList.Items.Add($"{DateTime.Now:HH:mm:ss}: {msg}"));
-        };
+            InitializeComponent();
 
-        StartBackgroundServer();
-    }
+            // Listen for Hub events to update UI
+            ServerEvents.OnMessageReceived += (msg) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    RequestList.Items.Add($"{DateTime.Now:HH:mm:ss}: {msg}");
+                });
+            };
 
-    private void StartBackgroundServer()
-    {
-        Task.Run(() =>
+            StartBackgroundServer();
+        }
+
+        private void StartBackgroundServer()
         {
-            var builder = WebApplication.CreateBuilder();
-            builder.Services.AddSignalR();
+            // Prevent duplicate server instances
+            if (serverStarted)
+                return;
 
-            // Listen on Port 5000 on ALL local network adapters
-            builder.WebHost.UseUrls("http://*:5000");
+            serverStarted = true;
 
-            var app = builder.Build();
-            app.MapHub<MyHub>("/requestHub");
+            Task.Run(() =>
+            {
+                try
+                {
+                    var builder = WebApplication.CreateBuilder();
 
-            Dispatcher.Invoke(() => StatusLabel.Text = "Status: Server Running on Port 5000");
-            app.Run();
-        });
+                    builder.Services.AddSignalR();
+
+                    // Listen on Port 5000
+                    builder.WebHost.UseUrls("http://*:5000");
+
+                    var app = builder.Build();
+
+                    app.MapHub<MyHub>("/requestHub");
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        StatusLabel.Text = "Status: Server Running on Port 5000";
+                    });
+
+                    app.Run();
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        StatusLabel.Text = $"Error: {ex.Message}";
+                    });
+                }
+            });
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (NavigationService != null &&
+                NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+            }
+        }
     }
 }

@@ -44,7 +44,7 @@ BEGIN
 	IF now < start THEN
 		SET message = CONCAT('Ticket Not Valid Before ', DATE(start));
 	ELSEIF now > end THEN
-		SET message = CONCAT('Ticket Expired After ', DATE(end));
+		SET message = CONCAT('Ticket Expired Afterstaff ', DATE(end));
 	ELSEIF now > start AND now < end THEN
 		SET message = CONCAT('Proceed.');
 		SET isValid = TRUE;

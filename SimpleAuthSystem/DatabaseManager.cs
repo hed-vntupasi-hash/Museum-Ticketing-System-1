@@ -15,7 +15,7 @@ namespace SimpleAuthSystem
 {
     public static class DatabaseManager
     {
-        private static string connectionString = "server=localhost;user=root;database=museum_ticketing_system;port=3306;password=root;";
+        private static string connectionString = "server=localhost;user=root;database=museum_ticketing_system;port=3306;password=root;Connection Timeout=5;";
 
 
         // Internal helper to get the connection
@@ -58,52 +58,115 @@ namespace SimpleAuthSystem
             }
         }
 
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
+        }
+
+        public static bool VerifyPassword(string password, string storedHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, storedHash);
+        }
+
         public static bool RegisterUser(string firstName, string lastName, string email, string phone, string username, string password)
         {
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
+
+
+            //Dito yata nag loloko
+            //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
+            //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            //MessageBox.Show(hashedPassword);
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                string query = "INSERT INTO staff (first_name, last_name, email, phone, username, password) VALUES (@first_name, @last_name, @email, @phone, @user, @pass)";
+
+                string query = "INSERT INTO DatabaseMangerRegisterUser (first_name, last_name, email, phone, username, password) VALUES (@first_name, @last_name, @email, @phone, @user, @pass)";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@first_name", firstName);
                 cmd.Parameters.AddWithValue("@last_name", lastName);
                 cmd.Parameters.AddWithValue("@email", email);
                 cmd.Parameters.AddWithValue("@phone", phone);
                 cmd.Parameters.AddWithValue("@user", username);
-                cmd.Parameters.AddWithValue("@pass", hashedPassword);
+                cmd.Parameters.AddWithValue("@pass", HashPassword(password));
 
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
+        public static bool EmailExists(string email)
+        {
+            bool exists = false;
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = "SELECT COUNT(*) FROM users WHERE email = @Email";
+
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Email", email);
+
+                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                        exists = count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Database Error: " + ex.Message);
+            }
+
+            return exists;
+        }
 
         public static bool ValidateLogin(string username, string password)
         {
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-            List<string> names = new List<string>();
-
             using (MySqlConnection conn = GetConnection())
             {
                 try
                 {
                     conn.Open();
+
                     string query = "SELECT password FROM staff WHERE username=@user";
+
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@user", username);
 
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
+                        if (reader.Read())
                         {
-                            // Access the column by name (or index)
-                            names.Add(reader["password"].ToString());
+                            string? storedpassword = reader["password"]?.ToString();
 
-                            //MessageBox.Show(hashedPassword + " " + names[0]);
-
-                            if (BCrypt.Net.BCrypt.Verify(password, names[0]))
+                            if (string.IsNullOrWhiteSpace(storedpassword))
                             {
-                                return true;
+                                MessageBox.Show("Stored password is empty.");
+                                return false;
                             }
+
+                            // testing
+                            //bool compare = verifypassword(password, storedpassword);
+                            //string s = "";
+
+                            //if (compare == true)
+                            //{
+                            //    s = "correct, matches";
+                            //}
+                            //else
+                            //{
+                            //    s = "wrong!";
+                            //}
+                            //messagebox.show(password + "\n" + storedpassword + "\n" + s);
+                            // ss
+
+
+
+
+
+                            return VerifyPassword(password, storedpassword);
                         }
                     }
                 }
@@ -111,9 +174,48 @@ namespace SimpleAuthSystem
                 {
                     MessageBox.Show(ex.Message);
                 }
-                return false;
             }
+
+            return false;
         }
+
+        //public static bool ValidateLogin(string username, string password)
+        //{
+        //    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+        //    List<string> names = new List<string>();
+
+        //    using (MySqlConnection conn = GetConnection())
+        //    {
+        //        try
+        //        {
+        //            conn.Open();
+        //            string query = "SELECT password FROM staff WHERE username=@user";
+        //            MySqlCommand cmd = new MySqlCommand(query, conn);
+        //            cmd.Parameters.AddWithValue("@user", username);
+
+        //            using (MySqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    // Access the column by name (or index)
+        //                    names.Add(reader["password"].ToString());
+
+        //                    //MessageBox.Show(hashedPassword + " " + names[0]);
+
+        //                    if (BCrypt.Net.BCrypt.Verify(password, names[0]))
+        //                    {
+        //                        return true;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show(ex.Message);
+        //        }
+        //        return false;
+        //    }
+        //}
 
         public static Tuple<int[], string[], decimal[]> GetTicketTypes()
         {
@@ -324,7 +426,7 @@ namespace SimpleAuthSystem
                     return false;
                 }
             }
-            return true;
+           
         }
 
         public static Tuple<string[], int[], decimal[]> GetTicketsByEvent()
@@ -355,6 +457,46 @@ namespace SimpleAuthSystem
                     MessageBox.Show(ex.Message);
                 }
                 return Tuple.Create(new string[0], new int[0], new decimal[0]);
+            }
+        }
+        public static Tuple<int[], string[], string[], Decimal[], DateTime[], string[], string[]> GetTicketRecords()
+        {
+            List<decimal> totalProfit = new List<decimal>();
+
+            List<int> ids = new List<int>();
+            List<string> types = new List<string>();
+            List<string> events = new List<string>();
+            List<Decimal> price = new List<Decimal>();
+            List<DateTime> creationDates = new List<DateTime>();
+            List<string> qrCodes = new List<string>();
+            List<string> descriptions = new List<string>();
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT T.ticket_id AS ID, TT.type_name Type, E.event_name AS Event, price AS Price, status AS Status, created_at AS Creation, qrcode AS QR, TT.description AS Description FROM tickets AS T LEFT JOIN ticket_types as TT ON T.ticket_type_id = TT.ticket_type_id LEFT JOIN events AS E ON T.event_id = E.event_id;";
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        ids.Add(Convert.ToInt32(reader["ID"]));
+                        types.Add(reader["Type"].ToString());
+                        events.Add(reader["Event"].ToString());
+                        price.Add(Convert.ToDecimal(reader["Price"]));
+                        creationDates.Add(Convert.ToDateTime(reader["Creation"]));
+                        qrCodes.Add(reader["QR"].ToString());
+                        descriptions.Add(reader["Description"].ToString());
+                    }
+                    return Tuple.Create(ids.ToArray(), types.ToArray(), events.ToArray(), price.ToArray(), creationDates.ToArray(), qrCodes.ToArray(), descriptions.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                return Tuple.Create(new int[0], new string[0], new string[0], new Decimal[0], new DateTime[0], new string[0], new string[0]);
             }
         }
     }

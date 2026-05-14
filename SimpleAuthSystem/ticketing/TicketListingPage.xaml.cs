@@ -1,15 +1,16 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Windows;
-
+using System.Windows.Controls;
 
 namespace SimpleAuthSystem
 {
     /// <summary>
-    /// Interaction logic for TicketListing.xaml
+    /// Interaction logic for TicketListingPage.xaml
     /// </summary>
-    public partial class TicketListing : Window
+    public partial class TicketListingPage : Page
     {
-        public TicketListing()
+        public TicketListingPage()
         {
             InitializeComponent();
             LoadData();
@@ -30,17 +31,21 @@ namespace SimpleAuthSystem
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            // Simply close this window to return to the previous one
-            this.Close();
+            // Navigate back
+            if (NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+            }
         }
+
         private void btnReload_Click(object sender, RoutedEventArgs e)
         {
-            // Simply call the existing method that fetches data from MySQL
             LoadData();
 
-            // Optional: Visual feedback to the user
-            MessageBox.Show("Data refreshed successfully!", "Success",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Data refreshed successfully!",
+                            "Success",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }

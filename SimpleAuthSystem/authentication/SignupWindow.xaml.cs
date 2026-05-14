@@ -8,6 +8,11 @@ namespace SimpleAuthSystem
 {
     public partial class SignupWindow : Window
     {
+
+        private string connectionString =
+
+           "server=localhost;database=museum_ticketing_system;uid=root;password=root;";
+
         public SignupWindow()
         {
             InitializeComponent();
@@ -30,6 +35,7 @@ namespace SimpleAuthSystem
                 errFirstName.Text = name;
                 errFirstName.Visibility = Visibility.Visible;
                 hasError = true;
+               
             }
             // Validate First Name'
          
@@ -39,6 +45,7 @@ namespace SimpleAuthSystem
                 errLastName.Text = name;
                 errLastName.Visibility = Visibility.Visible;
                 hasError = true;
+               
             }
            
 
@@ -48,6 +55,7 @@ namespace SimpleAuthSystem
             {
                 errLastName.Visibility = Visibility.Visible;
                 hasError = true;
+               
             }
 
             // Validate Username
@@ -55,22 +63,27 @@ namespace SimpleAuthSystem
             {
                 errUser.Visibility = Visibility.Visible;
                 hasError = true;
+               
             }
 
-            if (!ValidateEmail(txtEmail.Text))
+           if (!ValidateEmail(txtEmail.Text))
             {
                 errEmail.Visibility = Visibility.Visible;
                 hasError = true;
+                
             }
             if (!ValidatePassword(txtPass.Password))
             {
                 errPass.Visibility = Visibility.Visible;
+
                 hasError = true;
+                
             }
             if (!ValidateConfirmPassword())
             {
                 errConfirmPass.Visibility = Visibility.Visible;
                 hasError = true;
+                
             }
 
             string password = btnToggle.IsChecked == true ? txtPassReveal.Text : txtPass.Password;
@@ -153,31 +166,226 @@ namespace SimpleAuthSystem
                 errEmail.Text = "Email is valid.";
                 return true;
             }
+
         }
-     
         private void btnSignup_Click(object sender, RoutedEventArgs e)
         {
-            if (TextValidation() == false)
-            {
-                return;
-            }
-
             try
             {
-                bool isSuccess = DatabaseManager.RegisterUser(txtFirstName.Text, txtLastName.Text, txtEmail.Text, txtPhone.Text, txtUser.Text, txtPass.Password);
-
-                if (isSuccess)
+                using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
-                    MessageBox.Show("User Registered!");
-                    this.Close();
+                    conn.Open();
+
+                    // CHECK USERNAME FIRST
+                    string checkQuery = "SELECT COUNT(*) FROM staff WHERE username = @username";
+
+                    using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@username", txtUser.Text.Trim());
+
+                        int userExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (userExists > 0)
+                        {
+                            MessageBox.Show(
+                                "Username already exists.",
+                                "Duplicate Username",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                            return;
+                        }
+                    }
+
+                    // CHECK EMAIL
+                    if (DatabaseManager.EmailExists(txtEmail.Text.Trim()))
+                    {
+                        errEmail.Text = "Email already exists.";
+                        errEmail.Visibility = Visibility.Visible;
+                        return;
+                    }
+
+                    // VALIDATE INPUTS
+                    if (!TextValidation())
+                    {
+                        MessageBox.Show(
+                            "Invalid input!",
+                            "Validation Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+
+                        return;
+                    }
+
+                    // INSERT USER
+                    string insertQuery = @"INSERT INTO staff 
+            (username, first_name, last_name, email, phone, password)
+            VALUES
+            (@username, @first_name, @last_name, @email, @phone, @password)";
+
+                    using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@username", txtUser.Text.Trim());
+                        cmd.Parameters.AddWithValue("@first_name", txtFirstName.Text.Trim());
+                        cmd.Parameters.AddWithValue("@last_name", txtLastName.Text.Trim());
+                        cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
+                        cmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
+                        cmd.Parameters.AddWithValue("@password", DatabaseManager.HashPassword(txtPass.Password));
+
+                        int result = cmd.ExecuteNonQuery();
+
+                        if (result > 0)
+                        {
+                            txtUser.Clear();
+                            txtFirstName.Clear();
+                            txtLastName.Clear();
+                            txtEmail.Clear();
+                            txtPhone.Clear();
+                            txtPass.Password = "";
+
+                            MessageBox.Show(
+                                "User Registered!",
+                                "Success",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Registration failed.");
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number == 0)
+                {
+                    MessageBox.Show(
+                        "Cannot connect to server.\nCheck your internet or MySQL server.",
+                        "Network Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Database Error:\n" + ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Registration Error: " + ex.Message);
+                MessageBox.Show("Signup Error: " + ex.Message);
             }
         }
-       
+
+        //private void btnSignup_Click(object sender, RoutedEventArgs e)
+        //{
+
+        //    if (!TextValidation())
+        //    {
+        //        MessageBox.Show("Invalid!");
+        //        return;
+        //    }
+        //    MessageBox.Show("Valid!");
+
+        //    if (DatabaseManager.EmailExists(txtEmail.Text))
+        //    {
+        //        errEmail.Text = "Email already exists.";
+        //        errEmail.Visibility = Visibility.Visible;
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        //        {
+        //            conn.Open();
+
+        //            MessageBox.Show("Connected!");
+
+        //            // Check if username already exists
+        //            string checkQuery = "SELECT COUNT(*) FROM staff WHERE username = @username";
+
+        //            using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
+        //            {
+        //                checkCmd.Parameters.AddWithValue("@username", txtUser.Text);
+
+        //                int userExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+        //                if (userExists > 0)
+        //                {
+        //                    MessageBox.Show("Username Already Exist ? ");
+        //                    return;
+        //                }
+        //            }
+
+        //            // Insert new user
+        //            string insertQuery = @"INSERT INTO staff 
+        //            (username, first_name, last_name, email, phone, password)
+        //            VALUES
+        //            (@username, @first_name, @last_name, @email, @phone, @password)";
+
+        //            using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
+        //            {
+        //                cmd.Parameters.AddWithValue("@username", txtUser.Text);
+        //                cmd.Parameters.AddWithValue("@first_name", txtFirstName.Text);
+        //                cmd.Parameters.AddWithValue("@last_name", txtLastName.Text);
+        //                cmd.Parameters.AddWithValue("@email", txtEmail.Text);
+        //                cmd.Parameters.AddWithValue("@phone", txtPhone.Text);
+        //                cmd.Parameters.AddWithValue("@password", txtPass.Password);
+
+        //                int result = cmd.ExecuteNonQuery();
+
+        //                if (result > 0)
+        //                {
+        //                    txtUser.Clear();
+        //                    txtFirstName.Clear();
+        //                    txtLastName.Clear();
+        //                    txtEmail.Clear();
+        //                    txtPhone.Clear();
+        //                    txtPass.Password = "";
+
+        //                    MessageBox.Show("User Registered!");
+        //                    this.Close();
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show("Registration failed.");
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (MySqlException ex)
+        //    {
+        //        if (ex.Number == 0)
+        //        {
+        //            MessageBox.Show(
+        //                "Cannot connect to server.\nCheck your internet or MySQL server.",
+        //                "Network Error",
+        //                MessageBoxButton.OK,
+        //                MessageBoxImage.Error);
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show(
+        //                "Database Error:\n" + ex.Message,
+        //                "Error",
+        //                MessageBoxButton.OK,
+        //                MessageBoxImage.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Signup Error: " + ex.Message);
+        //    }
+        //}
+
+
         public bool ValidatePassword(string password)
         {
             bool hasLetter = Regex.IsMatch(password, "[a-zA-Z]");
@@ -199,7 +407,7 @@ namespace SimpleAuthSystem
                 errPass.Text = "Password must contain at least one letter.";
                 return false;
             }
-            else if (!Regex.IsMatch(password, "[0-9]"))
+            else if (!Regex.IsMatch(password, "[\\d]"))
             {
                 errPass.Text = "Password must contain at least one number.";
                 return false;
@@ -220,7 +428,7 @@ namespace SimpleAuthSystem
             {
                 errPass.Text = "";
 
-                return false;
+                return true;
 
             }
             
@@ -228,13 +436,13 @@ namespace SimpleAuthSystem
 
         public bool ValidateConfirmPassword()
         {
-
+            MessageBox.Show(txtConfirmPass.Password + "\n" + txtConfirmPass.Password);
             if (string.IsNullOrWhiteSpace(txtConfirmPassReveal.Text))
             {
                 errConfirmPass.Text = "Password is required.";
                 return false;
             }
-            else if (txtPassReveal.Text != txtConfirmPassReveal.Text)
+            else if (txtConfirmPass.Password != txtConfirmPass.Password)
             {
                 errConfirmPass.Text = "Passwords do not match.";
                 return false;
@@ -243,7 +451,7 @@ namespace SimpleAuthSystem
             {
                 errConfirmPass.Text = "";
 
-                return false;
+                return true;
             }
 
         }
@@ -284,7 +492,7 @@ namespace SimpleAuthSystem
             {
                 errConfirmPass.Text = "";
 
-                return false;
+                return true;
 
             }
 

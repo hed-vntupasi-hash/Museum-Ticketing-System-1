@@ -1,0 +1,120 @@
+﻿<Page x:Class="SimpleAuthSystem.DashboardHomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#F4F6F9">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+
+        <TextBlock Text="Dashboard"
+                   FontSize="30"
+                   FontWeight="Bold"
+                   Foreground="#1E293B"
+                   Margin="0 0 0 20"/>
+
+        <!-- Cards -->
+
+        <UniformGrid Grid.Row="1"
+                     Columns="3"
+                     Margin="0 0 0 20">
+
+            <!-- Total Tickets -->
+
+            <Border Background="White"
+                    CornerRadius="10"
+                    Margin="10"
+                    Padding="20">
+
+                <StackPanel>
+
+                    <TextBlock Text="Total Tickets"
+                               FontSize="18"
+                               Foreground="Gray"/>
+
+                    <TextBlock Text="150"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="#2563EB"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- Events -->
+
+            <Border Background="White"
+                    CornerRadius="10"
+                    Margin="10"
+                    Padding="20">
+
+                <StackPanel>
+
+                    <TextBlock Text="Events"
+                               FontSize="18"
+                               Foreground="Gray"/>
+
+                    <TextBlock Text="12"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="#10B981"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- Clients -->
+
+            <Border Background="White"
+                    CornerRadius="10"
+                    Margin="10"
+                    Padding="20">
+
+                <StackPanel>
+
+                    <TextBlock Text="Clients"
+                               FontSize="18"
+                               Foreground="Gray"/>
+
+                    <TextBlock Text="89"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="#F59E0B"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </UniformGrid>
+
+        <!-- Welcome Panel -->
+
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="10"
+                Padding="25">
+
+            <StackPanel>
+
+                <TextBlock Text="Welcome to SimpleAuth Dashboard"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Margin="0 0 0 10"/>
+
+                <TextBlock Text="Use the sidebar to navigate through the system."
+                           FontSize="16"
+                           Foreground="Gray"/>
+
+            </StackPanel>
+
+        </Border>
+
+    </Grid>
+
+</Page>

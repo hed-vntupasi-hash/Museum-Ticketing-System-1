@@ -3,9 +3,9 @@ using System.Windows;
 
 namespace SimpleAuthSystem
 {
-    public partial class Dashboard : Window
+    public partial class EventSales : Window
     {
-        public Dashboard()
+        public EventSales()
         {
             InitializeComponent();
 

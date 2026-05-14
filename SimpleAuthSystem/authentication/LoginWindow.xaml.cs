@@ -2,6 +2,7 @@
 using System.Windows;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
+using BCrypt.Net;
 namespace SimpleAuthSystem
 {
     public partial class LoginWindow : Window
@@ -10,16 +11,17 @@ namespace SimpleAuthSystem
         {
             InitializeComponent();
         }
+     
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
+
             try
             {
                 bool isAuthenticated = DatabaseManager.ValidateLogin(txtUser.Text, txtPass.Password);
-
                 if (isAuthenticated)
                 {
-                    new Menulist().Show();
+                    new Dashboard().Show();
                     this.Close();
                 }
                 else
@@ -32,6 +34,34 @@ namespace SimpleAuthSystem
                 MessageBox.Show("Login Error: " + ex.Message);
             }
         }
+
+    
+
+
+        //public static bool ValidateLogin(string username, string password)
+        //{
+        //    string connectionString = "server=localhost;user=root;database=museum_ticketing_system;port=3306;password=root;Connection Timeout=5;";
+        //    using (MySqlConnection conn = new MySqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+
+        //        string query = "SELECT Password FROM Users WHERE Username=@Username";
+
+        //        MySqlCommand cmd = new MySqlCommand(query, conn);
+        //        cmd.Parameters.AddWithValue("@Username", username);
+
+        //        object result = cmd.ExecuteScalar();
+
+        //        if (result != null)
+        //        {
+        //            string storedHash = result.ToString();
+
+        //            return BCrypt.Net.BCrypt.Verify(password, storedHash);
+        //        }
+        //    }
+
+        //    return false;
+        //}
 
 
         private void btnGoToSignup_Click(object sender, RoutedEventArgs e)
