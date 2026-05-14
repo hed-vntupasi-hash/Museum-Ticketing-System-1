@@ -62,7 +62,7 @@ namespace SimpleAuthSystem.QR
 
                     ResponseLabel.Text = text;
 
-                    StatusLabel.Text = $"Boolean: {flag}";
+                    //StatusLabel.Text = $"Boolean: {flag}";
 
                 });
 
