@@ -1,20 +1,98 @@
-﻿<Window x:Class="SimpleAuthSystem.QR.QrReaderWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="QR Code Reader" Height="200" Width="400">
+﻿<Window
+    x:Class="SimpleAuthSystem.QR.QrReaderWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="QR Reader"
+    Background="#9FAFC1">
+
     <Grid>
 
+        <Border
+            Width="420"
+            Height="260"
+            Background="#8FA0B5"
+            BorderBrush="#1A1F4A"
+            BorderThickness="8"
+            CornerRadius="4"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Padding="12">
 
-        <StackPanel Margin="20">
+            <Border
+                Background="#B8C4D6"
+                BorderBrush="#3B3F73"
+                BorderThickness="4"
+                Padding="15">
 
-            <Button Content="Select Image" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="40" Click="Button_Click"/>
+                <Grid>
 
-            <Separator Margin="0,20"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <TextBlock Text="Server Response:" FontWeight="Bold"/>
-            <TextBlock x:Name="ResponseLabel" Text="Waiting..." Margin="0,5" Foreground="DarkBlue"/>
-            <TextBlock x:Name="StatusLabel" Text="Boolean: --" Foreground="DarkGreen"/>
-        </StackPanel>
+                    <!-- Title -->
+                    <TextBlock
+                        Text="QR SCANNER"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        FontFamily="Consolas"
+                        Foreground="#3B3F73"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,10"/>
 
+                    <!-- Main Content -->
+                    <StackPanel
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Button
+                            Content="LOAD QR IMAGE"
+                            Click="Button_Click"
+                            Width="200"
+                            Height="55"
+                            FontSize="16"
+                            FontFamily="Consolas"
+                            FontWeight="Bold"
+                            Background="#D7DEE8"
+                            BorderBrush="#1F2450"
+                            BorderThickness="3"
+                            Foreground="#3B3F73"/>
+
+                        <TextBlock
+                            x:Name="ResponseLabel"
+                            Text="STATUS: WAITING"
+                            Margin="0,15,0,0"
+                            FontFamily="Consolas"
+                            FontSize="14"
+                            Foreground="#3B3F73"
+                            HorizontalAlignment="Center"/>
+
+                        <TextBlock
+                            x:Name="StatusLabel"
+                            Text=""
+                            Margin="0,5,0,0"
+                            FontFamily="Consolas"
+                            FontSize="14"
+                            Foreground="#3B3F73"
+                            HorizontalAlignment="Center"/>
+
+                    </StackPanel>
+
+                    <!-- Footer -->
+                    <TextBlock
+                        Grid.Row="2"
+                        Text="READY"
+                        FontFamily="Consolas"
+                        FontSize="13"
+                        FontWeight="Bold"
+                        Foreground="#3B3F73"
+                        HorizontalAlignment="Right"/>
+
+                </Grid>
+            </Border>
+        </Border>
     </Grid>
 </Window>
